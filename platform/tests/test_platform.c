@@ -806,6 +806,14 @@ test_libc(void)
    const int made = ps5_mkstemp(stem);
    check(made >= 0 && strcmp(stem + strlen(stem) - 6, "XXXXXX") != 0, "libc: mkstemp names and opens");
    check(!ps5_isatty(made) && errno == ENOTTY, "libc: isatty finds no terminal");
+   check(ps5_pathconf(stem, _PC_PATH_MAX) == PATH_MAX && ps5_pathconf("/tmp", _PC_NAME_MAX) == NAME_MAX &&
+             ps5_pathconf(stem, _PC_LINK_MAX) == 1,
+         "libc: pathconf answers the path limits");
+   errno = 0;
+   check(ps5_pathconf("/no/such/path", _PC_PATH_MAX) == -1 && errno == ENOENT,
+         "libc: pathconf of a missing path");
+   errno = 0;
+   check(ps5_pathconf("/tmp", _PC_ASYNC_IO) == -1 && errno == EINVAL, "libc: pathconf refuses other names");
    char target[32];
    check(ps5_readlink(stem, target, sizeof(target)) == -1 && errno == EINVAL,
          "libc: readlink finds a file is no link");

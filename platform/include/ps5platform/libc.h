@@ -13,7 +13,7 @@
  *   memccpy, times, sockatmark, getpwuid, getpwnam_r, posix_madvise, strsignal,
  *   gethostbyaddr, tmpfile,
  *   if_nametoindex, if_indextoname, mkstemp, isatty, link, symlink, readlink,
- *   fchown
+ *   fchown, pathconf
  *                          no system module exports them
  *   openat, unlinkat, fchmodat, fstatat, mkdirat, renameat
  *                          only libkernel_sys exports them, which titles do
@@ -264,6 +264,10 @@ int ps5_mkstemp(char *path_template);
  * symlink are refused as on a file system without them, readlink finds that an
  * existing path is no link (EINVAL), and fchown is not permitted (EPERM). */
 int ps5_isatty(int fd);
+/* pathconf for the limits a title's files have: _PC_PATH_MAX, _PC_NAME_MAX and
+ * _PC_PIPE_BUF as the SDK's headers give them, _PC_LINK_MAX 1, _PC_NO_TRUNC 1;
+ * -1 with stat's errno for a missing path, EINVAL for any other name. */
+long ps5_pathconf(const char *path, int name);
 int ps5_link(const char *existing, const char *name);
 int ps5_symlink(const char *target, const char *name);
 ssize_t ps5_readlink(const char *path, char *buffer, size_t size);

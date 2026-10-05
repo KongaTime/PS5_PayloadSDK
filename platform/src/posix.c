@@ -16,6 +16,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -97,6 +98,32 @@ ps5_isatty(int fd)
 {
    errno = fcntl(fd, F_GETFD) == -1 ? EBADF : ENOTTY;
    return 0;
+}
+
+/* As FreeBSD's pathconf, for what a title's files can answer: the path limits
+ * the SDK's headers give, one link to a file (a title can make no others), and
+ * names never truncated. libc++'s std::filesystem asks _PC_PATH_MAX. */
+long
+ps5_pathconf(const char *path, int name)
+{
+   struct stat info;
+   if (stat(path, &info) != 0)
+      return -1;
+   switch (name) {
+   case _PC_PATH_MAX:
+      return PATH_MAX;
+   case _PC_NAME_MAX:
+      return NAME_MAX;
+   case _PC_PIPE_BUF:
+      return PIPE_BUF;
+   case _PC_LINK_MAX:
+      return 1;
+   case _PC_NO_TRUNC:
+      return 1;
+   default:
+      errno = EINVAL;
+      return -1;
+   }
 }
 
 int
