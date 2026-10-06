@@ -126,6 +126,15 @@ ps5_pathconf(const char *path, int name)
    }
 }
 
+/* No program break on the console: the heap is direct memory in ranges. */
+void *
+ps5_sbrk(intptr_t increment)
+{
+   (void)increment;
+   errno = ENOMEM;
+   return (void *)-1;
+}
+
 int
 ps5_link(const char *existing, const char *name)
 {

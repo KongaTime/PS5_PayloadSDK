@@ -814,6 +814,8 @@ test_libc(void)
          "libc: pathconf of a missing path");
    errno = 0;
    check(ps5_pathconf("/tmp", _PC_ASYNC_IO) == -1 && errno == EINVAL, "libc: pathconf refuses other names");
+   errno = 0;
+   check(ps5_sbrk(0) == (void *)-1 && errno == ENOMEM, "libc: sbrk has no break to give");
    char target[32];
    check(ps5_readlink(stem, target, sizeof(target)) == -1 && errno == EINVAL,
          "libc: readlink finds a file is no link");

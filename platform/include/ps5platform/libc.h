@@ -13,7 +13,7 @@
  *   memccpy, times, sockatmark, getpwuid, getpwnam_r, posix_madvise, strsignal,
  *   gethostbyaddr, tmpfile,
  *   if_nametoindex, if_indextoname, mkstemp, isatty, link, symlink, readlink,
- *   fchown, pathconf
+ *   fchown, pathconf, sbrk
  *                          no system module exports them
  *   openat, unlinkat, fchmodat, fstatat, mkdirat, renameat
  *                          only libkernel_sys exports them, which titles do
@@ -268,6 +268,11 @@ int ps5_isatty(int fd);
  * _PC_PIPE_BUF as the SDK's headers give them, _PC_LINK_MAX 1, _PC_NO_TRUNC 1;
  * -1 with stat's errno for a missing path, EINVAL for any other name. */
 long ps5_pathconf(const char *path, int name);
+/* sbrk with no program break to move: a title's heap is direct memory mapped
+ * in ranges (ps5platform/heap.h), not a break. (void *)-1 with ENOMEM, as
+ * FreeBSD's sbrk where there is no break. LLVM's Process::GetMallocUsage asks
+ * sbrk(0). */
+void *ps5_sbrk(intptr_t increment);
 int ps5_link(const char *existing, const char *name);
 int ps5_symlink(const char *target, const char *name);
 ssize_t ps5_readlink(const char *path, char *buffer, size_t size);
